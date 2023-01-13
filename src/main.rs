@@ -63,9 +63,33 @@ fn pick_move(state: &State) -> Command {
 
     println!("Best line is {:?}",v);
     state.commands()[node.best()]
-
-    // state.commands()[0]
 }
+
+
+fn pick_move_2(state: &State)->Command{
+    let mut node = Node::new(state.clone());
+
+    let start = SystemTime::now();
+    
+
+    let n = 100000;
+    for i in 0..n{
+        node.mcts();
+    }
+
+    let duration = start.elapsed().unwrap();
+
+    let v: Vec<usize> = node.best_line().into_iter().map(|c| c.column).collect();
+
+    
+    println!("Ran {} playouts in {:?}.",n, duration);
+    println!("Best line is {:?}",v);
+    state.commands()[node.best()]
+
+    
+}
+
+
 
 fn play() {
     let mut state = State::new();
@@ -85,7 +109,7 @@ fn play() {
             break;
         }
 
-        let computer = pick_move(&state);
+        let computer = pick_move_2(&state);
 
         println!("Computer plays {}", computer);
 

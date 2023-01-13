@@ -10,7 +10,7 @@ pub struct Command {
     pub column: usize,
 }
 impl Command {
-    fn new(column: usize) -> Command {
+    pub fn new(column: usize) -> Command {
         assert!(column < 7);
         Command { column }
     }
@@ -42,6 +42,10 @@ impl State {
             result: result,
             commands_: commands(&board, result),
         }
+    }
+
+    pub fn cell(&self, i:usize, j:usize)->u8{
+        self.board[j][i]
     }
 }
 
@@ -347,7 +351,10 @@ mod tests {
 
         assert!(command == &Command { column: 0 });
 
+        assert!(s.cell(0,0)==0);
         s = s.apply(command);
+
+        assert!(s.cell(0,0)==1);
 
         println!("WHAT: {}", s);
         println!("board: {:?}", s.board);
