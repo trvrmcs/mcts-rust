@@ -1,4 +1,4 @@
-import init, { Connect4Game, TicTacToeGame } from "/pkg/mcts.js";
+import init, { Connect4Game, TicTacToeGame } from "../pkg/mcts.js";
 
 
 function create_game(game_type) {
