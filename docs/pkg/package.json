@@ -1,0 +1,14 @@
+{
+  "name": "mcts",
+  "version": "0.1.0",
+  "files": [
+    "mcts_bg.wasm",
+    "mcts.js",
+    "mcts.d.ts"
+  ],
+  "module": "mcts.js",
+  "types": "mcts.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
