@@ -1,0 +1,10 @@
+services:
+  wasm-builder:
+    build: .
+    volumes:
+      # direct build output into pkg directory
+      # unfortunately this is owned by root if you're running docker-compose as root 
+      # :shrug:
+      - ./web/pkg:/app/pkg
+
+    

@@ -1,13 +1,3 @@
-/*
-    I want a mechanism for highlighting legal moves.
-    
-    This means 2 things: SENDING the legal moves with the board state.
-    Painting them in response to mouse activity.
-    
-    Maybe we have a clickable overlay when it's your turn?
-    
-    
-*/
 Ractive.components.Connect4Board = Ractive.extend({
     data: { game: null },
     css: `
@@ -28,11 +18,14 @@ Ractive.components.Connect4Board = Ractive.extend({
         .target.PlayerOne:hover{
             fill:red;
         }
-         
+        svg{
+            border: solid 1px black;
+        } 
     `,
 
-    template: `  <button class="button" on-click="@this.fire('new_game',game)">New Game</button>
-        <h4 class="title is-4"> 
+    template: `  
+        
+        <h5 class="title is-5 is-info"> 
             {{#if game.result()=="PlayerOne"}}
                 You win!
             {{/if}}
@@ -49,23 +42,25 @@ Ractive.components.Connect4Board = Ractive.extend({
                     Thinking...
                 {{/if}}
             {{/if}}
-        </h4>
+        </h5>
+ 
     
         <svg width="350" height="350" class="default">
         
             {{#if (game.result()=="InProgress")}}
      
-                <rect class="board drop" width="350" height="40">
+                <rect class="board drop" width="350" height="48">
                 
                 </rect>
                 
                 {{#each [0,1,2,3,4,5,6] as i}}
                     <g transform="translate({{i*50}},0)">
+                        
                       <rect x="5" y="5" width="40" height="30" rx="5" 
-                        class="target {{game.player()}}"
+                        class="{{game.cell(i,5)=='Empty'?'target':''}} {{game.player()}}"
                         on-click="@this.fire("connect4_move",game, i)"
                       />
-     
+    
                     </g>
                 {{/each}}
             {{/if}}
@@ -77,9 +72,7 @@ Ractive.components.Connect4Board = Ractive.extend({
             {{#each [0,1,2,3,4,5] as j}}
                 {{#each [0,1,2,3,4,5,6] as i}}
                       <g transform="translate({{i*50}},{{300-j*50}})">
-                      <circle cx="25" cy="25" r="20" stroke="black" stroke-width="3" class="slot {{game.cell(i,j)}}"
-                        
-                      />
+                      <circle cx="25" cy="25" r="20" stroke="black" stroke-width="3" class="slot {{game.cell(i,j)}}" />
                     </g>
                 {{/each}}
             {{/each}}
@@ -90,24 +83,31 @@ Ractive.components.Connect4Board = Ractive.extend({
      
     `,
 
-    on: {
-        'new_game'(context, game) {
-            game.reset();
-            this.update();
-        },
+    on: { 
         'connect4_move'(context, game, column) {
             if (game.player() != "PlayerOne") {
-                console.log("Not your turn");
                 return;
             }
+            if (game.cell(column, 5)!="Empty"){
+                return
+            }
 
+            console.log("apply",column)
             let result = game.apply(column);
+            
+            console.log("result",result)
+            this.update();
+            if(game.result()!="InProgress")
+                return
+            
+                
 
             let T = this;
             function inner() {
 
                 start = Date.now();
-                let N = 100000;
+
+                let N = T.get('iterations');
                 let suggested = game.suggest_move(N);
                 duration = (Date.now() - start) / 1000;
 
@@ -116,15 +116,9 @@ Ractive.components.Connect4Board = Ractive.extend({
                 result = game.apply(suggested);
 
                 T.update()
-
-
             }
-            this.update();
             // allow paint to happen
             setTimeout(inner, 10);
-
-
-
-        }
+       }
     }
 });

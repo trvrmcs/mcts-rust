@@ -2,8 +2,6 @@ use crate::enums::{other_player, Player, Result};
 use crate::gamestate::GameState;
 use core::result;
 use std::fmt;
-use std::io;
-use std::io::Write; // <--- bring flush() into scope
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Command {
@@ -312,30 +310,10 @@ pub fn str_to_command(s: &String) -> result::Result<Command, &'static str> {
                 Err("Pick a number less than 7")
             }
         }
-        Err(what) => return Err("Can't parse column"),
+        Err(_what) => return Err("Can't parse column"),
     }
 }
 
-pub fn get_command(state: &State) -> Command {
-    /*
-    could be in main.rs
-    */
-    loop {
-        print!("Command> ");
-        io::stdout().flush().unwrap();
-
-        let mut str_command = String::new();
-
-        io::stdin()
-            .read_line(&mut str_command)
-            .expect("failed to readline");
-
-        match str_to_command(&str_command) {
-            Ok(command) => return command,
-            Err(why) => println!("{}", why),
-        }
-    }
-}
 
 #[cfg(test)]
 mod tests {

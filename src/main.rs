@@ -4,7 +4,10 @@ mod enums;
 mod gamestate;
 mod node;
 mod tictactoe;
-use std::time::{Duration, SystemTime};
+use std::time::{/*Duration, */SystemTime};
+
+use std::io;
+use std::io::Write; //bring flush() into scope
 
 use crate::enums::Result;
 
@@ -14,66 +17,18 @@ use crate::node::Node;
 use crate::gamestate::GameState;
 
 ///use crate::tictactoe::{State, get_command,Command};
-use crate::connect4::{get_command, Command, State};
-
-fn play_game() {
-    let mut s = State::new();
-
-    println!("The Board state is: {}", s);
-    println!("{:?} available commands", s.commands().len());
-
-    while s.result() == Result::InProgress {
-        let command = &s.commands()[0];
-        println!("Apply command {:?}", command);
-        s = s.apply(command);
-
-        println!("The Board state is: {}", s);
-
-        println!("{:?} available commands", s.commands().len());
-    }
-}
-
-fn learn() {
-    let s = State::new();
-
-    let mut n = Node::new(s);
-
-    println!("Node is {}", n);
-
-    for _n in 0..1000000 {
-        n.mcts();
-    }
-
-    println!("Node is {}", n);
-    show_best_line(n);
-}
-
-fn pick_move(state: &State) -> Command {
-    let mut node = Node::new(state.clone());
-
-    let then = SystemTime::now() + Duration::from_millis(1500);
-    while SystemTime::now() < then {
-        node.mcts();
-    }
-
-    println!("Node is {}", node);
+use crate::connect4::{str_to_command, Command, State};
 
 
-    let v: Vec<usize> = node.best_line().into_iter().map(|c| c.column).collect();
-
-    println!("Best line is {:?}",v);
-    state.commands()[node.best()]
-}
-
-
-fn pick_move_2(state: &State)->Command{
+fn pick_move(state: &State)->Command{
     let mut node = Node::new(state.clone());
 
     let start = SystemTime::now();
-    
+ //  let then = SystemTime::now() + Duration::from_millis(1500); 
 
+    // while SystemTime::now() < then {
     let n = 100000;
-    for i in 0..n{
+    for _i in 0..n{
         node.mcts();
     }
 
@@ -90,17 +45,38 @@ fn pick_move_2(state: &State)->Command{
 }
 
 
+pub fn get_human_command() -> Command {
+    /*
+    could be in main.rs
+    */
+    loop {
+        print!("Command> ");
+        io::stdout().flush().unwrap();
+
+        let mut str_command = String::new();
+
+        io::stdin()
+            .read_line(&mut str_command)
+            .expect("failed to readline");
+
+        match str_to_command(&str_command) {
+            Ok(command) => return command,
+            Err(why) => println!("{}", why),
+        }
+    }
+}
+
 
 fn play() {
     let mut state = State::new();
 
     println!("{}", state);
     loop {
-        let human = get_command(&state);
+        let human = get_human_command();
 
         println!("You chose {}", human);
 
-        /*TODO: reuse existing child node if applicable*/
+        /*TODO reuse existing child node if applicable*/
 
         state = state.apply(&human);
 
@@ -109,7 +85,7 @@ fn play() {
             break;
         }
 
-        let computer = pick_move_2(&state);
+        let computer = pick_move(&state);
 
         println!("Computer plays {}", computer);
 
@@ -122,25 +98,9 @@ fn play() {
 }
 
 fn main() {
-    // play_game();
-    // learn();
     play();
 }
 
-fn show_best_line(node: Node<State>) {
-    println!("Current best line is:");
-    let line = node.best_line();
-
-    let mut s = State::new();
-    println!("{}", s);
-
-    for c in line {
-        println!("{}", c);
-
-        s = s.apply(&c);
-        println!("{}", s);
-    }
-}
 
 #[cfg(test)]
 mod tests {

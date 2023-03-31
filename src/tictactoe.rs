@@ -8,13 +8,13 @@ use crate::gamestate::GameState;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Command {
-    i: usize,
-    j: usize,
+    pub i: usize,
+    pub j: usize,
 }
 
-const SIZE: usize = 3;
+pub const SIZE: usize = 3;
 impl Command {
-    fn new(i: usize, j: usize) -> Command {
+    pub fn new(i: usize, j: usize) -> Command {
         assert!(i < SIZE);
         assert!(j < SIZE);
         Command { i, j }
@@ -166,6 +166,10 @@ impl State {
             commands_: commands(&board, result),
         }
     }
+
+    pub fn cell(&self, i:usize, j:usize)->u8{
+        self.board[j][i]
+    }
 }
 
 impl fmt::Display for State {
@@ -252,13 +256,13 @@ pub fn str_to_command(s: &String) -> result::Result<Command, &'static str> {
                     Err("Pick numbers between 0 and 2")
                 }
             }
-            Err(what) => Err("Can't parse j"),
+            Err(_) => Err("Can't parse j"),
         },
-        Err(what) => return Err("Can't parse i"),
+        Err(_) => return Err("Can't parse i"),
     }
 }
 
-pub fn get_command(state: &State) -> Command {
+pub fn get_command() -> Command {
     loop {
         print!("Command> ");
         io::stdout().flush().unwrap();

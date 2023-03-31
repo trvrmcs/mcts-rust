@@ -171,19 +171,20 @@ impl<S: GameState + Clone + Display> Node<S> {
         self.playouts += 1;
     }
 
-    fn select_command_index(&self) -> usize {
-        assert!(self.state.result() == Result::InProgress);
-        assert!(self.state.commands().len() > 0);
-        let mut indices = vec![];
-        let mut rng = thread_rng();
 
-        for i in 0..self.state.commands().len() {
-            if !(&self.children.contains_key(&i)) {
-                indices.push(i)
+     
+    fn select_command_index(&self)->usize {
+        assert!(self.state.result()==Result::InProgress);
+
+        for i in 0..self.state.commands().len(){
+            if !(&self.children.contains_key(&i)){
+                return i
+                }
             }
-        }
-        *(indices.choose(&mut rng).unwrap())
+        panic!("no available unexplored commands");
     }
+
+   
 
     fn expand(&mut self) -> Result {
         assert!(self.state.result() == Result::InProgress);
