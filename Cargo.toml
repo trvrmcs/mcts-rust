@@ -10,6 +10,7 @@ crate-type = ["cdylib"]
 getrandom = { version = "0.2", features = ["js"] }
 rand = "0.8.4"
 wasm-bindgen = "0.2.37"
+console_error_panic_hook="0.1.6"
 
 
 # [dependencies]
