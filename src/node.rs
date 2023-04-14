@@ -1,5 +1,4 @@
 use std::fmt;
-use std::fmt::Display;
 
 use rand::seq::SliceRandom;
 
@@ -9,14 +8,14 @@ use rand::thread_rng;
 
 use std::collections::BTreeMap;
 
-pub struct Node<S: GameState + Clone + Display> {
+pub struct Node<S: GameState + Clone > {
     state: S,
     children: BTreeMap<usize, Node<S>>,
     playouts: u32,
     wins: f32, // half a point for a draw
 }
 
-impl<S: GameState + Clone + Display> Node<S> {
+impl<S: GameState + Clone > Node<S> {
     pub fn new(state: S) -> Self {
         let children = BTreeMap::new();
 
@@ -48,9 +47,9 @@ impl<S: GameState + Clone + Display> Node<S> {
             if r != Result::InProgress {
                 let c = self.state.commands();
                 println!(
-                    "Result:{:?}, state:{}, commands:{} ",
+                    "Result:{:?},   commands:{} ",
                     r,
-                    self.state,
+                    // self.state,
                     c.len()
                 );
 
@@ -114,26 +113,7 @@ impl<S: GameState + Clone + Display> Node<S> {
         best
     }
 
-    // pub fn best_command(&self) -> S::CommandType {
-    //     let index=self. best();
-    //     self.state.commands()[index]
-    // }
-
-    pub fn best_line(&self) -> Vec<S::CommandType> {
-        if self.children.len() > 0 {
-            let index = self.best();
-            let child = &self.children[&index];
-            let c = self.state.commands()[index];
-
-            let mut v1 = vec![c];
-            let v2 = child.best_line();
-
-            v1.extend(v2);
-            v1
-        } else {
-            vec![]
-        }
-    }
+ 
 
     pub fn playout(&self) -> Result {
         if self.state.result() != Result::InProgress {
@@ -229,14 +209,14 @@ impl<S: GameState + Clone + Display> Node<S> {
     }
 }
 
-impl<S: GameState + Clone + Display> fmt::Display for Node<S> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "Node(playouts={}, ratio={}, nodes={})",
-            self.playouts,
-            self.ratio(),
-            self.size()
-        )
-    }
-}
+// impl<S: GameState + Clone + Display> fmt::Display for Node<S> {
+//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//         write!(
+//             f,
+//             "Node(playouts={}, ratio={}, nodes={})",
+//             self.playouts,
+//             self.ratio(),
+//             self.size()
+//         )
+//     }
+// }

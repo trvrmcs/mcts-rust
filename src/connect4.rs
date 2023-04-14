@@ -1,6 +1,6 @@
 use crate::enums::{other_player, Player, Result};
 use crate::gamestate::GameState;
-use core::result;
+
 use std::fmt;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -42,7 +42,7 @@ impl State {
         }
     }
 
-    pub fn cell(&self, i:usize, j:usize)->u8{
+    pub fn cell(&self, i: usize, j: usize) -> u8 {
         self.board[j][i]
     }
 }
@@ -301,19 +301,6 @@ impl GameState for State {
         }
     }
 }
-pub fn str_to_command(s: &String) -> result::Result<Command, &'static str> {
-    match s.trim().parse::<usize>() {
-        Ok(column) => {
-            if column < 7 {
-                Ok(Command::new(column))
-            } else {
-                Err("Pick a number less than 7")
-            }
-        }
-        Err(_what) => return Err("Can't parse column"),
-    }
-}
-
 
 #[cfg(test)]
 mod tests {
@@ -329,10 +316,10 @@ mod tests {
 
         assert!(command == &Command { column: 0 });
 
-        assert!(s.cell(0,0)==0);
+        assert!(s.cell(0, 0) == 0);
         s = s.apply(command);
 
-        assert!(s.cell(0,0)==1);
+        assert!(s.cell(0, 0) == 1);
 
         println!("WHAT: {}", s);
         println!("board: {:?}", s.board);

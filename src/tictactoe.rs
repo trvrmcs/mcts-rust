@@ -1,7 +1,4 @@
-use core::result;
 use std::fmt;
-use std::io;
-use std::io::Write; // <--- bring flush() into scope
 
 use crate::enums::{other_player, Player, Result};
 use crate::gamestate::GameState;
@@ -21,11 +18,11 @@ impl Command {
     }
 }
 
-impl fmt::Display for Command {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "[{},{}]", self.i, self.j)
-    }
-}
+// impl fmt::Display for Command {
+//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//         write!(f, "[{},{}]", self.i, self.j)
+//     }
+// }
 
 type BoardType = [[u8; SIZE]; SIZE];
 
@@ -40,7 +37,7 @@ pub struct State {
 }
 
 fn commands(board: &BoardType, result: Result) -> Vec<Command> {
-    let mut c = vec![];
+    let mut c: Vec<Command> = vec![];
 
     if result != Result::InProgress {
         return c;
@@ -121,6 +118,7 @@ fn diag_result_2(board: &BoardType) -> Result {
 }
 
 fn result(board: &BoardType) -> Result {
+    
     for i in 0..SIZE {
         let r = column_result(board, i);
         if r != Result::InProgress {
@@ -172,25 +170,7 @@ impl State {
     }
 }
 
-impl fmt::Display for State {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        for row in &self.board {
-            write!(f, "\n")?;
-            for cell in row {
-                if *cell == 0 {
-                    write!(f, ".")?
-                }
-                if *cell == 1 {
-                    write!(f, "O")?
-                }
-                if *cell == 2 {
-                    write!(f, "X")?
-                }
-            }
-        }
-        write!(f, "\n{:?}", &self.result())
-    }
-}
+ 
 
 impl GameState for State {
     type CommandType = Command;
@@ -239,46 +219,9 @@ impl GameState for State {
         }
     }
 }
+ 
 
-pub fn str_to_command(s: &String) -> result::Result<Command, &'static str> {
-    let vec: Vec<&str> = s.split_whitespace().collect();
-
-    if vec.len() != 2 {
-        return Err("Enter 2 numbers.");
-    }
-
-    match vec[0].parse::<usize>() {
-        Ok(i) => match vec[1].parse::<usize>() {
-            Ok(j) => {
-                if i < 3 && j < 3 {
-                    Ok(Command::new(i, j))
-                } else {
-                    Err("Pick numbers between 0 and 2")
-                }
-            }
-            Err(_) => Err("Can't parse j"),
-        },
-        Err(_) => return Err("Can't parse i"),
-    }
-}
-
-pub fn get_command() -> Command {
-    loop {
-        print!("Command> ");
-        io::stdout().flush().unwrap();
-
-        let mut str_command = String::new();
-
-        io::stdin()
-            .read_line(&mut str_command)
-            .expect("failed to readline");
-
-        match str_to_command(&str_command) {
-            Ok(command) => return command,
-            Err(why) => println!("{}", why),
-        }
-    }
-}
+ 
 
 #[cfg(test)]
 mod tests {
