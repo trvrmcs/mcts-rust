@@ -1,4 +1,5 @@
-import init, { Connect4Game, TicTacToeGame } from "../pkg/mcts.js";
+import init, { Connect4Game, TicTacToeGame, CorridorGame} from "../pkg/mcts.js";
+
 
 
 function create_game(game_type) {
@@ -6,7 +7,8 @@ function create_game(game_type) {
   console.log("new game of type", game_type)
   let constructor = {
     'tictactoe': TicTacToeGame,
-    'connect4': Connect4Game
+    'connect4': Connect4Game,
+    'corridor': CorridorGame
   }[game_type];
 
   return new constructor();
@@ -58,17 +60,24 @@ const MainScreen = Ractive.extend({
       <button class="button is-rounded {{gametype=='connect4'?'is-info':''}}" on-click="@this.fire('new_game','connect4')">
        Connect4
       </button> 
+      <button class="button is-rounded {{gametype=='corridor'?'is-info':''}}" on-click="@this.fire('new_game','corridor')">
+       Corridor
+      </button> 
       </div>
  
  
 
 
       <div class="has-text-centered">
-         {{#if gametype=='connect4'}}
+        {{#if gametype=='connect4'}}
           <Connect4Board game={{game}} iterations={{iterations}}/>
-        {{/if}}
-        {{#if gametype=='tictactoe'}}
+        {{elseif gametype=='tictactoe'}}
           <TicTacToeBoard game={{game}} iterations={{iterations}}/>
+        {{elseif gametype=='corridor'}}
+          
+          <CorridorBoard game={{game}} iterations={{iterations}}/>
+        {{else}}
+         ???
         {{/if}}
       </div>
 
@@ -85,7 +94,7 @@ const MainScreen = Ractive.extend({
 init().then(() => {
 
 
-  let game_type = 'tictactoe';
+  let game_type = 'corridor';
   let game = create_game(game_type);
 
   new MainScreen({ el: "#main", data: { game: game, gametype: game_type, iterations:1000 } });
